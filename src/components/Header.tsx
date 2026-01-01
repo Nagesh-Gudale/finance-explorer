@@ -1,8 +1,17 @@
-import { Coins, Menu, Trophy, TrendingUp, X } from "lucide-react";
+import { Coins, Menu, Trophy, TrendingUp, X, User, Settings, LogOut, Award } from "lucide-react";
 import { Button } from "./ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 interface HeaderProps {
   credits: number;
@@ -67,6 +76,50 @@ const Header = ({ credits }: HeaderProps) => {
               <Trophy className="w-4 h-4" />
               Rank #42
             </Button>
+
+            {/* Profile Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="relative rounded-full ring-2 ring-border hover:ring-primary transition-all"
+                >
+                  <Avatar className="h-9 w-9">
+                    <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=finquest" alt="Profile" />
+                    <AvatarFallback className="bg-primary text-primary-foreground">
+                      <User className="w-4 h-4" />
+                    </AvatarFallback>
+                  </Avatar>
+                </motion.button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 bg-card border-border">
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium text-foreground">Alex Trader</p>
+                    <p className="text-xs text-muted-foreground">alex@finquest.com</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-border" />
+                <DropdownMenuItem className="cursor-pointer text-muted-foreground hover:text-foreground">
+                  <User className="mr-2 h-4 w-4" />
+                  <span>My Profile</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer text-muted-foreground hover:text-foreground">
+                  <Award className="mr-2 h-4 w-4" />
+                  <span>Achievements</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer text-muted-foreground hover:text-foreground">
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-border" />
+                <DropdownMenuItem className="cursor-pointer text-destructive hover:text-destructive">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             
             {/* Mobile Menu Button */}
             <button
