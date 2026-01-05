@@ -9,6 +9,8 @@ import PortfolioPage from "./pages/PortfolioPage";
 import LeaderboardPage from "./pages/LeaderboardPage";
 import MarketNewsPage from "./pages/MarketNewsPage";
 import Auth from "./pages/Auth";
+import AdminAuth from "./pages/AdminAuth";
+import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,6 +23,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/auth" element={<Auth />} />
+          <Route path="/admin-auth" element={<AdminAuth />} />
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/" element={<Index />} />
           <Route path="/learn" element={<Learn />} />
           <Route path="/portfolio" element={<PortfolioPage />} />
