@@ -1,4 +1,5 @@
 import { Clock, Coins, Lock, Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 
 interface ModuleCardProps {
@@ -11,6 +12,7 @@ interface ModuleCardProps {
   progress?: number;
   locked?: boolean;
   icon: React.ReactNode;
+  moduleId?: string;
 }
 
 const ModuleCard = ({
@@ -23,9 +25,17 @@ const ModuleCard = ({
   progress = 0,
   locked = false,
   icon,
+  moduleId,
 }: ModuleCardProps) => {
+  const navigate = useNavigate();
   const difficultyLabels = ["Beginner", "Intermediate", "Advanced"];
   const difficultyColors = ["text-gain", "text-gold", "text-loss"];
+
+  const handleStart = () => {
+    if (!locked && moduleId) {
+      navigate(`/course/${moduleId}`);
+    }
+  };
 
   return (
     <div className={`group relative rounded-2xl bg-gradient-card border border-border p-6 transition-all duration-300 hover:border-primary/50 hover:shadow-glow ${locked ? 'opacity-60' : ''}`}>
@@ -86,7 +96,7 @@ const ModuleCard = ({
           <Coins className="w-4 h-4 text-gold" />
           <span className="font-display font-semibold text-gold">+{reward}</span>
         </div>
-        <Button variant="default" size="sm" disabled={locked}>
+        <Button variant="default" size="sm" disabled={locked} onClick={handleStart}>
           {progress > 0 && progress < 100 ? 'Continue' : 'Start'}
         </Button>
       </div>
