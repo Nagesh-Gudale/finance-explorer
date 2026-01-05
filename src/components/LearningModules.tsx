@@ -13,6 +13,7 @@ const modules = [
     difficulty: 1 as const,
     progress: 100,
     icon: <Wallet className="w-6 h-6" />,
+    moduleId: "budgeting-basics",
   },
   {
     title: "Emergency Fund Strategy",
@@ -23,6 +24,7 @@ const modules = [
     difficulty: 1 as const,
     progress: 65,
     icon: <PiggyBank className="w-6 h-6" />,
+    moduleId: "emergency-fund-strategy",
   },
   {
     title: "Credit Score Mastery",
@@ -33,6 +35,7 @@ const modules = [
     difficulty: 2 as const,
     progress: 0,
     icon: <CreditCard className="w-6 h-6" />,
+    moduleId: "credit-score-mastery",
   },
   {
     title: "Introduction to Stocks",
@@ -43,6 +46,7 @@ const modules = [
     difficulty: 2 as const,
     progress: 0,
     icon: <LineChart className="w-6 h-6" />,
+    moduleId: "introduction-to-stocks",
   },
   {
     title: "Risk Management",
@@ -53,6 +57,7 @@ const modules = [
     difficulty: 3 as const,
     locked: true,
     icon: <Shield className="w-6 h-6" />,
+    moduleId: "risk-management",
   },
   {
     title: "Portfolio Diversification",
@@ -63,6 +68,7 @@ const modules = [
     difficulty: 3 as const,
     locked: true,
     icon: <BookOpen className="w-6 h-6" />,
+    moduleId: "portfolio-diversification",
   },
 ];
 

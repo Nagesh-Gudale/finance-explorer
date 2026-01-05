@@ -11,6 +11,7 @@ import MarketNewsPage from "./pages/MarketNewsPage";
 import Auth from "./pages/Auth";
 import AdminAuth from "./pages/AdminAuth";
 import AdminDashboard from "./pages/AdminDashboard";
+import CoursePage from "./pages/CoursePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/" element={<Index />} />
           <Route path="/learn" element={<Learn />} />
+          <Route path="/course/:moduleId" element={<CoursePage />} />
           <Route path="/portfolio" element={<PortfolioPage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/market-news" element={<MarketNewsPage />} />
