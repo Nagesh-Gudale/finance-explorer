@@ -1,73 +1,119 @@
-# Welcome to your Lovable project
+💸 Gamified FinTech Learning Platform with AI-Driven Market Insights
+📌 Overview
 
-## Project info
+This project is a gamified fintech learning platform designed to improve financial literacy among students and young professionals through interactive learning, simulated financial decision-making, and real-world market awareness.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+Instead of traditional passive learning (videos and articles), the platform allows users to learn by doing — earning virtual credits, making financial decisions, and seeing how those decisions perform under changing market conditions influenced by real-world fintech news.
 
-## How can I edit this code?
+🎯 Problem Statement
 
-There are several ways of editing your application.
+Financial literacy among students and young professionals is alarmingly low.
+Most existing platforms fail because they:
 
-**Use Lovable**
+Are theory-heavy and non-interactive
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+Do not simulate real financial decision-making
 
-Changes made via Lovable will be committed automatically to this repo.
+Are disconnected from real-world market behavior
 
-**Use your preferred IDE**
+As a result, users struggle to understand risk, reward, market trends, and long-term financial planning.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+💡 Solution
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Our platform introduces a game-based learning approach where users:
 
-Follow these steps:
+Complete structured fintech learning modules
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Earn virtual money/credits for completing modules
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Use earned credits to make financial choices such as investing, saving, or spending
 
-# Step 3: Install the necessary dependencies.
-npm i
+Compete on a leaderboard based on financial performance
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+The system dynamically adapts outcomes using AI-inferred market trends, making learning realistic and engaging.
 
-**Edit a file directly in GitHub**
+🤖 AI & Market Intelligence
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Gemini API is used to:
 
-**Use GitHub Codespaces**
+Summarize real-world fintech and market news
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Infer current market sentiment (Bullish / Bearish / Neutral)
 
-## What technologies are used for this project?
+Market sentiment directly impacts:
 
-This project is built with:
+Investment outcomes
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Risk levels
 
-## How can I deploy this project?
+Credit growth or loss
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+This removes reliance on static rules and makes the experience context-aware and realistic.
 
-## Can I connect a custom domain to my Lovable project?
+🏗️ System Architecture
 
-Yes, you can!
+Frontend
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Built using Next.js / React with TypeScript
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Interactive dashboards, modules, and leaderboards
+
+Backend & Cloud
+
+Firebase Authentication for secure user login
+
+Firestore for storing users, modules, credits, decisions, and leaderboard data
+
+Firebase Hosting for fast and secure deployment
+
+Cloud Functions for backend logic and API handling
+
+Analytics & Insights
+
+Google Analytics to track user engagement and learning behavior
+
+📊 Core Features
+
+Gamified fintech learning modules
+
+Virtual credit-based economy
+
+AI-driven market trend simulation
+
+Real-time leaderboard
+
+Fintech news summarization
+
+Secure authentication and cloud storage
+
+🚀 Impact
+
+Makes financial education engaging and practical
+
+Helps users understand real-world market behavior safely
+
+Encourages smart financial decision-making
+
+Bridges the gap between theory and real-life finance
+
+🔮 Future Scope
+
+Personalized learning paths based on user behavior
+
+Advanced AI-based portfolio analysis
+
+Multiplayer challenges and tournaments
+
+Mobile application support
+
+Integration with live market APIs
+
+🛠️ Tech Stack
+
+Frontend: Next.js, React, TypeScript
+
+Backend: Firebase (Auth, Firestore, Hosting, Cloud Functions)
+
+AI: Gemini API
+
+Analytics: Google Analytics
