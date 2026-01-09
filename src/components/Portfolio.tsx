@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, forwardRef, useImperativeHandle } from "react";
 import { 
   ArrowDownRight, 
   ArrowUpRight, 
@@ -23,7 +23,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const Portfolio = () => {
+export interface PortfolioHandle {
+  openInvestModal: () => void;
+}
+
+const Portfolio = forwardRef<PortfolioHandle>((_, ref) => {
   const {
     marketData,
     holdings,
@@ -41,6 +45,10 @@ const Portfolio = () => {
   const [isInvestModalOpen, setIsInvestModalOpen] = useState(false);
   const [sellModalData, setSellModalData] = useState<Holding | null>(null);
   const [sellAmount, setSellAmount] = useState("");
+
+  useImperativeHandle(ref, () => ({
+    openInvestModal: () => setIsInvestModalOpen(true),
+  }));
 
   const handleInvest = (asset: MarketAsset, amount: number, shares: number) => {
     addInvestment(asset, amount, shares);
@@ -297,6 +305,8 @@ const Portfolio = () => {
       </Dialog>
     </section>
   );
-};
+});
+
+Portfolio.displayName = "Portfolio";
 
 export default Portfolio;

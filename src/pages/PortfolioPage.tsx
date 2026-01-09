@@ -1,13 +1,34 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import Portfolio from "@/components/Portfolio";
+import Portfolio, { PortfolioHandle } from "@/components/Portfolio";
+import PortfolioAnalytics from "@/components/PortfolioAnalytics";
+import AIRecommendations from "@/components/AIRecommendations";
 import { motion } from "framer-motion";
-import { LineChart, PieChart, TrendingUp, Wallet } from "lucide-react";
+import { PieChart, TrendingUp, Wallet, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useMarketData } from "@/hooks/useMarketData";
 
 const PortfolioPage = () => {
   const [credits] = useState(8250);
+  const portfolioRef = useRef<PortfolioHandle>(null);
+  
+  const {
+    marketData,
+    holdings,
+    availableCredits,
+    totalPortfolioValue,
+    totalProfitLoss,
+    totalProfitLossPercent,
+  } = useMarketData();
+
+  const handleTradeNow = () => {
+    portfolioRef.current?.openInvestModal();
+  };
+
+  const handleViewAnalytics = () => {
+    document.getElementById("analytics-section")?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -42,11 +63,11 @@ const PortfolioPage = () => {
               </p>
 
               <div className="flex justify-center gap-4">
-                <Button variant="hero" className="gap-2">
+                <Button variant="hero" className="gap-2" onClick={handleTradeNow}>
                   <TrendingUp className="w-4 h-4" />
                   Trade Now
                 </Button>
-                <Button variant="outline" className="gap-2">
+                <Button variant="outline" className="gap-2" onClick={handleViewAnalytics}>
                   <PieChart className="w-4 h-4" />
                   View Analytics
                 </Button>
@@ -61,26 +82,50 @@ const PortfolioPage = () => {
               className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto mt-12"
             >
               <div className="p-4 rounded-xl bg-gradient-card border border-border text-center">
-                <div className="font-display text-xl font-bold text-foreground">$34,200</div>
+                <div className="font-display text-xl font-bold text-foreground">
+                  ${totalPortfolioValue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                </div>
                 <div className="text-sm text-muted-foreground">Total Value</div>
               </div>
               <div className="p-4 rounded-xl bg-gradient-card border border-border text-center">
-                <div className="font-display text-xl font-bold text-gain">+6.4%</div>
-                <div className="text-sm text-muted-foreground">30D Return</div>
+                <div className={`font-display text-xl font-bold ${totalProfitLossPercent >= 0 ? 'text-gain' : 'text-loss'}`}>
+                  {totalProfitLossPercent >= 0 ? '+' : ''}{totalProfitLossPercent.toFixed(1)}%
+                </div>
+                <div className="text-sm text-muted-foreground">Total Return</div>
               </div>
               <div className="p-4 rounded-xl bg-gradient-card border border-border text-center">
-                <div className="font-display text-xl font-bold text-foreground">5</div>
+                <div className="font-display text-xl font-bold text-foreground">{holdings.length}</div>
                 <div className="text-sm text-muted-foreground">Holdings</div>
               </div>
               <div className="p-4 rounded-xl bg-gradient-card border border-border text-center">
-                <div className="font-display text-xl font-bold text-primary">12</div>
-                <div className="text-sm text-muted-foreground">Trades</div>
+                <div className="font-display text-xl font-bold text-primary">
+                  ${availableCredits.toLocaleString()}
+                </div>
+                <div className="text-sm text-muted-foreground">Available</div>
               </div>
             </motion.div>
           </div>
         </section>
 
-        <Portfolio />
+        <Portfolio ref={portfolioRef} />
+        
+        {/* Analytics & AI Section */}
+        <section id="analytics-section" className="py-12">
+          <div className="container mx-auto px-6">
+            <div className="grid lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
+              <PortfolioAnalytics 
+                holdings={holdings} 
+                totalValue={totalPortfolioValue} 
+              />
+              <AIRecommendations 
+                holdings={holdings}
+                marketData={marketData}
+                availableCredits={availableCredits}
+                onTradeNow={handleTradeNow}
+              />
+            </div>
+          </div>
+        </section>
       </main>
       <Footer />
     </div>
