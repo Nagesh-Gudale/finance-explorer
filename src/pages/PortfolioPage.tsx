@@ -81,23 +81,23 @@ const PortfolioPage = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto mt-12"
             >
-              <div className="p-4 rounded-xl bg-gradient-card border border-border text-center">
+              <div className="p-4 rounded-xl bg-card border border-border text-center">
                 <div className="font-display text-xl font-bold text-foreground">
                   ${totalPortfolioValue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                 </div>
                 <div className="text-sm text-muted-foreground">Total Value</div>
               </div>
-              <div className="p-4 rounded-xl bg-gradient-card border border-border text-center">
+              <div className="p-4 rounded-xl bg-card border border-border text-center">
                 <div className={`font-display text-xl font-bold ${totalProfitLossPercent >= 0 ? 'text-gain' : 'text-loss'}`}>
                   {totalProfitLossPercent >= 0 ? '+' : ''}{totalProfitLossPercent.toFixed(1)}%
                 </div>
                 <div className="text-sm text-muted-foreground">Total Return</div>
               </div>
-              <div className="p-4 rounded-xl bg-gradient-card border border-border text-center">
+              <div className="p-4 rounded-xl bg-card border border-border text-center">
                 <div className="font-display text-xl font-bold text-foreground">{holdings.length}</div>
                 <div className="text-sm text-muted-foreground">Holdings</div>
               </div>
-              <div className="p-4 rounded-xl bg-gradient-card border border-border text-center">
+              <div className="p-4 rounded-xl bg-card border border-border text-center">
                 <div className="font-display text-xl font-bold text-primary">
                   ${availableCredits.toLocaleString()}
                 </div>
@@ -107,10 +107,8 @@ const PortfolioPage = () => {
           </div>
         </section>
 
-        <Portfolio ref={portfolioRef} />
-        
-        {/* Analytics & AI Section */}
-        <section id="analytics-section" className="py-12">
+        {/* Analytics & AI Section - BEFORE Portfolio */}
+        <section id="analytics-section" className="py-8">
           <div className="container mx-auto px-6">
             <div className="grid lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
               <PortfolioAnalytics 
@@ -126,6 +124,8 @@ const PortfolioPage = () => {
             </div>
           </div>
         </section>
+
+        <Portfolio ref={portfolioRef} />
       </main>
       <Footer />
     </div>
