@@ -23,66 +23,69 @@ const COLORS = [
 ];
 
 const PortfolioAnalytics = ({ holdings, totalValue }: PortfolioAnalyticsProps) => {
+  // Use demo data if no holdings
+  const hasHoldings = holdings.length > 0;
+  
+  const demoHoldings: Holding[] = [
+    { symbol: "AAPL", name: "Apple Inc.", shares: 10, avgBuyPrice: 175, currentPrice: 185, value: 1850, change: 2.5, profitLoss: 100, profitLossPercent: 5.7, category: "stocks" },
+    { symbol: "BTC", name: "Bitcoin", shares: 0.05, avgBuyPrice: 42000, currentPrice: 44000, value: 2200, change: 3.2, profitLoss: 100, profitLossPercent: 4.8, category: "crypto" },
+    { symbol: "SPY", name: "S&P 500 ETF", shares: 5, avgBuyPrice: 470, currentPrice: 480, value: 2400, change: 1.1, profitLoss: 50, profitLossPercent: 2.1, category: "etf" },
+    { symbol: "SBI-FD", name: "SBI Fixed Deposit", shares: 1, avgBuyPrice: 2000, currentPrice: 2000, value: 2000, change: 0, profitLoss: 35, profitLossPercent: 1.75, category: "fd", interestRate: 7.1 },
+    { symbol: "GOLD", name: "Gold", shares: 20, avgBuyPrice: 60, currentPrice: 63, value: 1260, change: 0.5, profitLoss: 60, profitLossPercent: 5, category: "commodities" },
+  ];
+  
+  const displayHoldings = hasHoldings ? holdings : demoHoldings;
+  const displayTotalValue = hasHoldings ? totalValue : demoHoldings.reduce((sum, h) => sum + h.value, 0);
+
   // Allocation by asset
   const allocationData = useMemo(() => {
-    return holdings.map((h, i) => ({
+    return displayHoldings.map((h, i) => ({
       name: h.symbol,
       value: h.value,
-      percentage: ((h.value / totalValue) * 100).toFixed(1),
+      percentage: ((h.value / displayTotalValue) * 100).toFixed(1),
       color: COLORS[i % COLORS.length],
     }));
-  }, [holdings, totalValue]);
+  }, [displayHoldings, displayTotalValue]);
 
   // Allocation by category
   const categoryData = useMemo(() => {
     const categoryMap: Record<string, number> = {};
-    holdings.forEach(h => {
+    displayHoldings.forEach(h => {
       const cat = h.category.toUpperCase();
       categoryMap[cat] = (categoryMap[cat] || 0) + h.value;
     });
     return Object.entries(categoryMap).map(([name, value], i) => ({
       name,
       value,
-      percentage: ((value / totalValue) * 100).toFixed(1),
+      percentage: ((value / displayTotalValue) * 100).toFixed(1),
       color: COLORS[i % COLORS.length],
     }));
-  }, [holdings, totalValue]);
+  }, [displayHoldings, displayTotalValue]);
 
   // Performance data (simulated historical)
   const performanceData = useMemo(() => {
-    const baseValue = totalValue * 0.85;
+    const baseValue = displayTotalValue * 0.85;
     return Array.from({ length: 30 }, (_, i) => {
       const progress = i / 29;
       const variation = Math.sin(i * 0.5) * 0.03 + Math.random() * 0.02;
-      const value = baseValue + (totalValue - baseValue) * progress + totalValue * variation;
+      const value = baseValue + (displayTotalValue - baseValue) * progress + displayTotalValue * variation;
       return {
         day: `Day ${i + 1}`,
         value: parseFloat(value.toFixed(2)),
         profit: parseFloat((value - baseValue).toFixed(2)),
       };
     });
-  }, [totalValue]);
+  }, [displayTotalValue]);
 
   // P/L by holding
   const plData = useMemo(() => {
-    return holdings.map(h => ({
+    return displayHoldings.map(h => ({
       name: h.symbol,
       profitLoss: parseFloat(h.profitLoss.toFixed(2)),
       percentage: parseFloat(h.profitLossPercent.toFixed(2)),
       fill: h.profitLoss >= 0 ? "hsl(142.1 76.2% 36.3%)" : "hsl(346.8 77.2% 49.8%)",
     }));
-  }, [holdings]);
-
-  if (holdings.length === 0) {
-    return (
-      <Card className="bg-gradient-card border-border">
-        <CardContent className="py-12 text-center">
-          <PieChartIcon className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-          <p className="text-muted-foreground">Make investments to see analytics</p>
-        </CardContent>
-      </Card>
-    );
-  }
+  }, [displayHoldings]);
 
   return (
     <motion.div
@@ -92,9 +95,16 @@ const PortfolioAnalytics = ({ holdings, totalValue }: PortfolioAnalyticsProps) =
     >
       <Card className="bg-gradient-card border-border">
         <CardHeader>
-          <CardTitle className="font-display flex items-center gap-2">
-            <Activity className="w-5 h-5 text-primary" />
-            Portfolio Analytics
+          <CardTitle className="font-display flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Activity className="w-5 h-5 text-primary" />
+              Portfolio Analytics
+            </div>
+            {!hasHoldings && (
+              <span className="text-xs font-normal text-muted-foreground bg-secondary px-2 py-1 rounded">
+                Demo Data
+              </span>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent>
