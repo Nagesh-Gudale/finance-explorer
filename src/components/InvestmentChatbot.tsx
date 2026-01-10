@@ -37,6 +37,8 @@ interface InvestmentChatbotProps {
     amount: number;
     shares: number;
   } | null;
+  onRevertTransaction?: () => { type: "buy" | "sell"; asset: any; amount: number; shares: number } | null;
+  hasTransactionHistory?: boolean;
 }
 
 const InvestmentChatbot = ({
@@ -45,6 +47,8 @@ const InvestmentChatbot = ({
   totalPortfolioValue,
   availableCredits,
   lastTransaction,
+  onRevertTransaction,
+  hasTransactionHistory = false,
 }: InvestmentChatbotProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -266,6 +270,12 @@ const InvestmentChatbot = ({
     }
 
     if (lowerQuery.includes("revert") || lowerQuery.includes("undo") || lowerQuery.includes("change decision")) {
+      if (!hasTransactionHistory) {
+        return {
+          message: `⏪ **No Transactions to Revert**\n\nYou haven't made any investments yet! Make some investments first, then you can use the time reversal feature to undo them if needed.`,
+          suggestions: ["Investment ideas", "Market overview", "Portfolio analysis"],
+        };
+      }
       return {
         message: `⏪ **Time Travel Mode**\n\nWant to go back in time and change a past investment decision?\n\nClick the button below to activate the time reversal feature!`,
         suggestions: ["🕐 Activate Time Reversal", "Cancel"],
@@ -273,6 +283,12 @@ const InvestmentChatbot = ({
     }
 
     if (lowerQuery.includes("activate time reversal")) {
+      if (!hasTransactionHistory) {
+        return {
+          message: `❌ No transactions to revert. Make some investments first!`,
+          suggestions: ["Investment ideas", "Market overview"],
+        };
+      }
       triggerRevertAnimation();
       return {
         message: "",
@@ -296,17 +312,32 @@ const InvestmentChatbot = ({
     setIsReverting(true);
     setIsTyping(false);
     
-    // After animation completes, show the completion message
+    // After animation completes, actually revert and show the completion message
     setTimeout(() => {
+      const revertedTx = onRevertTransaction?.();
       setIsReverting(false);
       setRevertComplete(true);
+      
+      let content = `✨ **Time Reversal Complete!**\n\n🎉 You've successfully traveled back in time!\n\n`;
+      
+      if (revertedTx) {
+        if (revertedTx.type === "buy") {
+          content += `📤 **Reverted:** Your purchase of ${revertedTx.shares.toFixed(4)} shares of ${revertedTx.asset.symbol} for $${revertedTx.amount.toFixed(2)} has been undone.\n\n`;
+          content += `💰 $${revertedTx.amount.toFixed(2)} has been returned to your available credits.`;
+        } else {
+          content += `📥 **Reverted:** Your sale of ${revertedTx.shares.toFixed(4)} shares of ${revertedTx.asset.symbol} has been undone.\n\n`;
+          content += `📈 Your holdings have been restored.`;
+        }
+      } else {
+        content += `You can now make a different investment choice!`;
+      }
       
       const completionMessage: Message = {
         id: Date.now().toString(),
         type: "bot",
-        content: `✨ **Time Reversal Complete!**\n\n🎉 You've successfully traveled back in time!\n\nYou can now change your past investment decision. Head to your portfolio and make a different choice - the timeline is yours to rewrite!\n\n💡 Remember: With great power comes great responsibility. Choose wisely this time!`,
+        content,
         timestamp: new Date(),
-        suggestions: ["View my portfolio", "Investment tips", "What changed?"],
+        suggestions: ["Revert another", "View my portfolio", "Investment tips"],
       };
       setMessages(prev => [...prev, completionMessage]);
       

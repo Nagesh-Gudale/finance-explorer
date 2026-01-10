@@ -45,9 +45,11 @@ const Portfolio = forwardRef<PortfolioHandle>((_, ref) => {
     totalPortfolioValue,
     totalProfitLoss,
     totalProfitLossPercent,
+    transactionHistory,
     fetchMarketData,
     addInvestment,
     sellHolding,
+    revertLastTransaction,
   } = useMarketData();
 
   const [isInvestModalOpen, setIsInvestModalOpen] = useState(false);
@@ -332,6 +334,8 @@ const Portfolio = forwardRef<PortfolioHandle>((_, ref) => {
         totalPortfolioValue={totalPortfolioValue}
         availableCredits={availableCredits}
         lastTransaction={lastTransaction}
+        onRevertTransaction={revertLastTransaction}
+        hasTransactionHistory={transactionHistory.length > 0}
       />
     </section>
   );
