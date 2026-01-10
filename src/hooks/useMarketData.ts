@@ -126,6 +126,13 @@ const formatLargeNumber = (num: number): string => {
 export const useMarketData = () => {
   const [marketData, setMarketData] = useState<MarketAsset[]>([]);
   const [holdings, setHoldings] = useState<Holding[]>([]);
+  const [transactionHistory, setTransactionHistory] = useState<Array<{
+    type: "buy" | "sell";
+    asset: MarketAsset;
+    amount: number;
+    shares: number;
+    previousHolding?: Holding;
+  }>>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [availableCredits, setAvailableCredits] = useState(10000);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -186,6 +193,16 @@ export const useMarketData = () => {
     // Check minimum investment for FDs
     if (asset.minInvestment && amount < asset.minInvestment) return false;
     
+    // Store the previous state for potential revert
+    const existingHolding = holdings.find(h => h.symbol === asset.symbol);
+    setTransactionHistory(prev => [...prev, {
+      type: "buy",
+      asset,
+      amount,
+      shares,
+      previousHolding: existingHolding ? { ...existingHolding } : undefined,
+    }]);
+    
     setHoldings(prev => {
       const existingIndex = prev.findIndex(h => h.symbol === asset.symbol);
       
@@ -238,13 +255,25 @@ export const useMarketData = () => {
     
     setAvailableCredits(prev => prev - amount);
     return true;
-  }, [availableCredits]);
+  }, [availableCredits, holdings]);
 
   const sellHolding = useCallback((symbol: string, sharesToSell: number) => {
     const holding = holdings.find(h => h.symbol === symbol);
     if (!holding || sharesToSell > holding.shares) return false;
     
     const saleValue = sharesToSell * holding.currentPrice;
+    const asset = marketData.find(m => m.symbol === symbol);
+    
+    // Store the previous state for potential revert
+    if (asset) {
+      setTransactionHistory(prev => [...prev, {
+        type: "sell",
+        asset,
+        amount: saleValue,
+        shares: sharesToSell,
+        previousHolding: { ...holding },
+      }]);
+    }
     
     setHoldings(prev => {
       if (sharesToSell >= holding.shares) {
@@ -272,7 +301,47 @@ export const useMarketData = () => {
     
     setAvailableCredits(prev => prev + saleValue);
     return true;
-  }, [holdings]);
+  }, [holdings, marketData]);
+
+  const revertLastTransaction = useCallback(() => {
+    if (transactionHistory.length === 0) return null;
+    
+    const lastTx = transactionHistory[transactionHistory.length - 1];
+    
+    if (lastTx.type === "buy") {
+      // Revert a buy: remove shares and refund credits
+      if (lastTx.previousHolding) {
+        // Had existing holding - restore it
+        setHoldings(prev => prev.map(h => 
+          h.symbol === lastTx.asset.symbol ? lastTx.previousHolding! : h
+        ));
+      } else {
+        // Was a new holding - remove it entirely
+        setHoldings(prev => prev.filter(h => h.symbol !== lastTx.asset.symbol));
+      }
+      setAvailableCredits(prev => prev + lastTx.amount);
+    } else {
+      // Revert a sell: restore the holding
+      if (lastTx.previousHolding) {
+        setHoldings(prev => {
+          const existingIndex = prev.findIndex(h => h.symbol === lastTx.asset.symbol);
+          if (existingIndex >= 0) {
+            const updated = [...prev];
+            updated[existingIndex] = lastTx.previousHolding!;
+            return updated;
+          } else {
+            return [...prev, lastTx.previousHolding!];
+          }
+        });
+        setAvailableCredits(prev => prev - lastTx.amount);
+      }
+    }
+    
+    // Remove the transaction from history
+    setTransactionHistory(prev => prev.slice(0, -1));
+    
+    return lastTx;
+  }, [transactionHistory]);
 
   // Initial fetch
   useEffect(() => {
@@ -300,8 +369,10 @@ export const useMarketData = () => {
     totalPortfolioValue,
     totalProfitLoss,
     totalProfitLossPercent,
+    transactionHistory,
     fetchMarketData,
     addInvestment,
     sellHolding,
+    revertLastTransaction,
   };
 };
