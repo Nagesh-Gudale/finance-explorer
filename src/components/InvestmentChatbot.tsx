@@ -9,7 +9,9 @@ import {
   TrendingDown,
   Lightbulb,
   AlertTriangle,
-  CheckCircle
+  CheckCircle,
+  RotateCcw,
+  Clock
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -51,11 +53,13 @@ const InvestmentChatbot = ({
       type: "bot",
       content: "👋 Hi! I'm your AI investment advisor. I'll provide suggestions after each investment to help you build a balanced portfolio. How can I help you today?",
       timestamp: new Date(),
-      suggestions: ["Analyze my portfolio", "What should I invest in?", "Market overview"],
+      suggestions: ["Analyze my portfolio", "What should I invest in?", "Market overview", "Revert a decision"],
     },
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [isReverting, setIsReverting] = useState(false);
+  const [revertComplete, setRevertComplete] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const prevTransactionRef = useRef<typeof lastTransaction>(null);
 
@@ -260,16 +264,54 @@ const InvestmentChatbot = ({
         suggestions: ["Reduce risk", "Risk-reward balance", "Safe haven assets"],
       };
     }
+
+    if (lowerQuery.includes("revert") || lowerQuery.includes("undo") || lowerQuery.includes("change decision")) {
+      return {
+        message: `⏪ **Time Travel Mode**\n\nWant to go back in time and change a past investment decision?\n\nClick the button below to activate the time reversal feature!`,
+        suggestions: ["🕐 Activate Time Reversal", "Cancel"],
+      };
+    }
+
+    if (lowerQuery.includes("activate time reversal")) {
+      triggerRevertAnimation();
+      return {
+        message: "",
+        suggestions: [],
+      };
+    }
     
     return {
       message: `I'm here to help with your investment decisions! I can:\n\n` +
         `• 📊 Analyze your portfolio\n` +
         `• 🎯 Suggest investments\n` +
         `• 📈 Provide market overview\n` +
-        `• ⚖️ Help with diversification\n\n` +
+        `• ⚖️ Help with diversification\n` +
+        `• ⏪ Revert past decisions\n\n` +
         `What would you like to know?`,
-      suggestions: ["Portfolio analysis", "Investment ideas", "Market trends"],
+      suggestions: ["Portfolio analysis", "Investment ideas", "Market trends", "Revert a decision"],
     };
+  };
+
+  const triggerRevertAnimation = () => {
+    setIsReverting(true);
+    setIsTyping(false);
+    
+    // After animation completes, show the completion message
+    setTimeout(() => {
+      setIsReverting(false);
+      setRevertComplete(true);
+      
+      const completionMessage: Message = {
+        id: Date.now().toString(),
+        type: "bot",
+        content: `✨ **Time Reversal Complete!**\n\n🎉 You've successfully traveled back in time!\n\nYou can now change your past investment decision. Head to your portfolio and make a different choice - the timeline is yours to rewrite!\n\n💡 Remember: With great power comes great responsibility. Choose wisely this time!`,
+        timestamp: new Date(),
+        suggestions: ["View my portfolio", "Investment tips", "What changed?"],
+      };
+      setMessages(prev => [...prev, completionMessage]);
+      
+      setTimeout(() => setRevertComplete(false), 3000);
+    }, 3500);
   };
 
   return (
@@ -332,6 +374,69 @@ const InvestmentChatbot = ({
             {/* Messages */}
             <ScrollArea className="h-[350px] p-4" ref={scrollRef}>
               <div className="space-y-4">
+                <AnimatePresence>
+                  {isReverting && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="absolute inset-0 z-10 flex items-center justify-center bg-background/95 backdrop-blur-sm"
+                    >
+                      <div className="text-center space-y-6">
+                        <motion.div
+                          animate={{ 
+                            rotate: -360,
+                            scale: [1, 1.2, 1],
+                          }}
+                          transition={{ 
+                            rotate: { duration: 2, repeat: Infinity, ease: "linear" },
+                            scale: { duration: 1, repeat: Infinity }
+                          }}
+                          className="w-20 h-20 mx-auto rounded-full bg-primary/20 flex items-center justify-center"
+                        >
+                          <RotateCcw className="w-10 h-10 text-primary" />
+                        </motion.div>
+                        
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.3 }}
+                        >
+                          <h3 className="text-lg font-semibold text-foreground mb-2">Reversing Time...</h3>
+                          <p className="text-sm text-muted-foreground">Traveling back to your past decision</p>
+                        </motion.div>
+                        
+                        <motion.div className="flex justify-center gap-2">
+                          {[0, 1, 2, 3, 4].map((i) => (
+                            <motion.div
+                              key={i}
+                              initial={{ opacity: 0.3 }}
+                              animate={{ 
+                                opacity: [0.3, 1, 0.3],
+                                scale: [1, 1.2, 1]
+                              }}
+                              transition={{ 
+                                duration: 0.5, 
+                                delay: i * 0.1,
+                                repeat: Infinity,
+                                repeatDelay: 0.5
+                              }}
+                              className="w-3 h-3 rounded-full bg-primary"
+                            />
+                          ))}
+                        </motion.div>
+
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: "100%" }}
+                          transition={{ duration: 3, ease: "easeInOut" }}
+                          className="h-1 bg-primary rounded-full mx-auto max-w-[200px]"
+                        />
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 {messages.map((msg) => (
                   <motion.div
                     key={msg.id}
