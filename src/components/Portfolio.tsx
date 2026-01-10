@@ -15,6 +15,7 @@ import AnimatedSection from "./AnimatedSection";
 import { motion } from "framer-motion";
 import { useMarketData, Holding, MarketAsset } from "@/hooks/useMarketData";
 import InvestmentModal from "./InvestmentModal";
+import InvestmentChatbot from "./InvestmentChatbot";
 import { Input } from "./ui/input";
 import {
   Dialog,
@@ -25,6 +26,13 @@ import {
 
 export interface PortfolioHandle {
   openInvestModal: () => void;
+}
+
+interface LastTransaction {
+  type: "buy" | "sell";
+  asset: string;
+  amount: number;
+  shares: number;
 }
 
 const Portfolio = forwardRef<PortfolioHandle>((_, ref) => {
@@ -45,6 +53,7 @@ const Portfolio = forwardRef<PortfolioHandle>((_, ref) => {
   const [isInvestModalOpen, setIsInvestModalOpen] = useState(false);
   const [sellModalData, setSellModalData] = useState<Holding | null>(null);
   const [sellAmount, setSellAmount] = useState("");
+  const [lastTransaction, setLastTransaction] = useState<LastTransaction | null>(null);
 
   useImperativeHandle(ref, () => ({
     openInvestModal: () => setIsInvestModalOpen(true),
@@ -52,12 +61,25 @@ const Portfolio = forwardRef<PortfolioHandle>((_, ref) => {
 
   const handleInvest = (asset: MarketAsset, amount: number, shares: number) => {
     addInvestment(asset, amount, shares);
+    setLastTransaction({
+      type: "buy",
+      asset: asset.symbol,
+      amount,
+      shares,
+    });
   };
 
   const handleSell = () => {
     if (sellModalData && sellAmount) {
       const shares = parseFloat(sellAmount);
+      const amount = shares * sellModalData.currentPrice;
       sellHolding(sellModalData.symbol, shares);
+      setLastTransaction({
+        type: "sell",
+        asset: sellModalData.symbol,
+        amount,
+        shares,
+      });
       setSellModalData(null);
       setSellAmount("");
     }
@@ -303,6 +325,14 @@ const Portfolio = forwardRef<PortfolioHandle>((_, ref) => {
           )}
         </DialogContent>
       </Dialog>
+      {/* AI Chatbot */}
+      <InvestmentChatbot
+        holdings={holdings}
+        marketData={marketData}
+        totalPortfolioValue={totalPortfolioValue}
+        availableCredits={availableCredits}
+        lastTransaction={lastTransaction}
+      />
     </section>
   );
 });
